@@ -17,6 +17,13 @@ app.get('/', (req, res) => {
     res.send('API Operational');
 });
 
+app.get('/author', (req, res) => {
+    res.json({
+        author: "Matthew Pieterse",
+        github: "https://github.com/mattpieterse"
+    });
+});
+
 // --- Exported
 
 module.exports = app;
