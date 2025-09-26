@@ -46,6 +46,12 @@ app.get('/author', (req, res) => {
     });
 });
 
+app.get('/health', (req, res) =>
+    res.status(200).json({
+        ok: true,
+        ts: Date.now()
+    }));
+
 app.post('/csp-violation-report', (req, res) => {
     console.log('CSP Violation:', req.body);
     res.status(204).end();
