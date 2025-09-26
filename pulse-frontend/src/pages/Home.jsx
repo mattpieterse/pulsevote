@@ -1,11 +1,27 @@
 ﻿import {Navbar} from '@/components/Navbar';
 import {useAuth} from '@/contexts/AuthContext';
 import {Alert, AlertDescription} from '@/components/ui/alert';
+import {Button} from '@/components/ui/button';
+import {useNavigate} from 'react-router-dom';
 
 // --- Exported
 
 export function Home() {
     const {user} = useAuth();
+    const navigate = useNavigate();
+
+    const violateCSP = () => {
+        const script = document.createElement('script');
+        script.src = 'https://unapproved-cdn.com/script.js';
+        document.head.appendChild(script);
+
+        console.log('CSP violation triggered. Check /csp-violation endpoint for reports.');
+    };
+
+    const violationLogs = () => {
+        navigate('/csp-violation-report');
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar/>
@@ -21,6 +37,23 @@ export function Home() {
                             Logged in as: <strong>{user?.email}</strong>
                         </AlertDescription>
                     </Alert>
+
+                    <div className="mb-6 flex justify-center gap-4">
+                        <Button
+                            onClick={violateCSP}
+                            variant="outline"
+                            className="bg-orange-100 border-orange-300 text-orange-700 hover:bg-orange-200"
+                        >
+                            Trigger CSP Violation
+                        </Button>
+                        <Button
+                            onClick={violationLogs}
+                            variant="outline"
+                            className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200"
+                        >
+                            View Violation Logs
+                        </Button>
+                    </div>
 
                     <div className="prose max-w-none">
                         <p className="text-gray-600 text-lg mb-4">
