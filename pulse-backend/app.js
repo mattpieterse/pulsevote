@@ -3,48 +3,56 @@ const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const authRoutes = require("./routes/authRoutes");
-const {requireToken} = require("./middleware/authMiddleware");
 const organisationRoutes = require("./routes/organisationRoutes");
 const pollRoutes = require("./routes/pollRoutes");
-
-// --- Internal
+const {requireToken} = require("./middleware/authMiddleware");
 
 dotenv.config();
-
 const app = express();
 
-app.set('trust proxy', 1);
-app.use(helmet({
-    contentSecurityPolicy: {
+app.use(helmet());
+
+const CSP_CONNECT = (process.env.CSP_CONNECT || '').split(',').filter(Boolean);
+const defaultConnect = [
+    "'self'",
+    "http://localhost:5000", "https://localhost:5000",
+    "http://localhost:5173", "https://localhost:5173",
+    "ws://localhost:5173", "wss://localhost:5173"
+];
+
+app.use(
+    helmet.contentSecurityPolicy({
+        useDefaults: true,
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "https://apis.google.com"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["'self'", "data:"],
-            connectSrc: ["'self'", "http://localhost:5000"],
-            reportUri: '/csp-violation-report',
+            connectSrc: CSP_CONNECT.length ? CSP_CONNECT : defaultConnect,
         },
-    },
-    crossOriginEmbedderPolicy: false,
-}));
+    })
+);
 
-app.use(express.json());
+const allowed = (process.env.CORS_ORIGINS || "http://localhost:5173,https://localhost:5173")
+    .split(',')
+    .map(s => s.trim());
+
 app.use(cors({
-    origin: "*",
+    origin: (origin, cb) => {
+        if (!origin) return cb(null, true);
+        if (allowed.includes(origin)) return cb(null, true);
+        cb(new Error(`CORS blocked: ${origin}`));
+    },
     credentials: true
 }));
 
-app.get('/', (req, res) => {
-    res.send('API Operational');
-});
+app.use(express.json());
+app.set('trust proxy', 1);
 
-app.get('/author', (req, res) => {
-    res.json({
-        author: "Matthew Pieterse",
-        github: "https://github.com/mattpieterse"
-    });
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/organisations", organisationRoutes);
+app.use("/api/polls", pollRoutes);
 
 app.get('/health', (req, res) =>
     res.status(200).json({
@@ -52,22 +60,22 @@ app.get('/health', (req, res) =>
         ts: Date.now()
     }));
 
-app.post('/csp-violation-report', (req, res) => {
-    console.log('CSP Violation:', req.body);
-    res.status(204).end();
-});
+app.get('/', (req, res) =>
+    res.send('PulseVote API running!'));
 
-app.get("/api/protected", requireToken, (req, res) => {
+app.get('/test', (req, res) => {
     res.json({
-        message: `${req.user.id} successfully entered a secured endpoint.`,
+        message: 'This is a test endpoint from PulseVote API!',
+        status: 'success',
         timestamp: new Date()
     });
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/organisations", organisationRoutes);
-app.use("/api/polls", pollRoutes);
-
-// --- Exported
+app.get("/api/protected", requireToken, (req, res) => {
+    res.json({
+        message: `Welcome, user ${req.user.id}! You have accessed protected data.`,
+        timestamp: new Date()
+    });
+});
 
 module.exports = app;
