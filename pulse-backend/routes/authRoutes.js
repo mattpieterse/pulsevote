@@ -1,6 +1,7 @@
 ﻿const express = require("express");
-const {signUp, signIn} = require("../controllers/authController");
+const {login, registerAdmin, registerManager, registerUser} = require("../controllers/authController");
 const {body} = require("express-validator");
+const {requireRole, requireToken} = require("../middleware/authMiddleware");
 
 // --- Internal
 
@@ -16,8 +17,10 @@ const passwordValidator = body("password")
     .matches(/\d/).withMessage("Password must include a number")
     .trim().escape();
 
-router.post("/signUp", emailValidator, passwordValidator, signUp);
-router.post("/signIn", [emailValidator, body("password").notEmpty().trim().escape()], signIn);
+router.post("/register-user", emailValidator, passwordValidator, registerUser);
+router.post("/register-manager", requireToken, requireRole("admin"), emailValidator, passwordValidator, registerManager);
+router.post("/register-admin", emailValidator, passwordValidator, registerAdmin);
+router.post("/login", [emailValidator, body("password").notEmpty().trim().escape()], login);
 
 // --- Exported
 
