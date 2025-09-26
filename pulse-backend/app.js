@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const dotenv = require('dotenv');
 const authRoutes = require("./routes/authRoutes");
 const {requireToken} = require("./middleware/authMiddleware");
+const organisationRoutes = require("./routes/organisationRoutes");
 
 // --- Internal
 
@@ -56,6 +57,7 @@ app.get("/api/protected", requireToken, (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/organisations", organisationRoutes);
 
 // --- Exported
 
