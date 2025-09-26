@@ -1,5 +1,6 @@
 ﻿const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const {validationResult} = require("express-validator");
 
 // --- Internal
 
@@ -10,6 +11,10 @@ const generateToken = (id) => {
 // --- Exported
 
 exports.signUp = async function (req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(400).json({message: "Invalid input", errors: errors.array()});
+
     const {email, password} = req.body;
     try {
         const alreadyExists = await User.findOne({email});
@@ -32,6 +37,10 @@ exports.signUp = async function (req, res) {
 };
 
 exports.signIn = async function (req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(400).json({message: "Invalid input", errors: errors.array()});
+
     const {email, password} = req.body;
     try {
         const entity = await User.findOne({email});
