@@ -6,7 +6,7 @@ import './App.css'
 function App() {
     const [author, setAuthor] = useState(null);
     useEffect(() => {
-        fetch('http://localhost:5000/author')
+        fetch('/author')
             .then((res) => res.json())
             .then((json) => setAuthor(json))
             .catch(
