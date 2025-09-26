@@ -27,7 +27,7 @@ schema.pre("save", async function (next) {
 
 schema.methods.comparePassword = function (candidate) {
     return bcrypt.compare(candidate, this.password);
-}
+};
 
 // --- Exported
 
