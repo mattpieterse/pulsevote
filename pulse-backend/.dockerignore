@@ -1,0 +1,15 @@
+﻿node_modules
+npm-debug.log
+Dockerfile*
+.dockerignore
+.git
+.gitignore
+coverage
+.vscode
+.circleci
+ssl
+.env
+.env.*.local
+test
+jest.config.js
+eslint.config.cjs
