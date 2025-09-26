@@ -3,6 +3,20 @@ const bcrypt = require('bcrypt');
 
 // --- Internal
 
+const roleSchema = new mongoose.Schema({
+    organisationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Organisation"
+    },
+    role: {
+        type: String,
+        enum: ["admin", "manager", "user"],
+        required: true
+    }
+}, {
+    _id: false
+});
+
 const schema = new mongoose.Schema({
     email: {
         type: String,
@@ -12,7 +26,8 @@ const schema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-    }
+    },
+    roles: [roleSchema]
 });
 
 schema.pre("save", async function (next) {
@@ -31,4 +46,4 @@ schema.methods.comparePassword = function (candidate) {
 
 // --- Exported
 
-module.exports = mongoose.model('User', schema);
+module.exports = mongoose.models.User || mongoose.model('User', schema);
