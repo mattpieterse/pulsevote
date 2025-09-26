@@ -1,6 +1,8 @@
 ﻿.idea/
+.vite/
 node_modules/
 build/
 dist/
 *.log
+.pem
 .env
