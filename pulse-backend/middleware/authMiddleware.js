@@ -1,4 +1,5 @@
 ﻿const jwt = require("jsonwebtoken");
+const User = require('../models/user');
 
 // --- Internal
 
@@ -55,5 +56,4 @@ const requireRole = (role) => {
 
 // --- Exported
 
-module.exports = {requireToken};
-module.exports = {requireRole};
+module.exports = {requireToken, requireRole};

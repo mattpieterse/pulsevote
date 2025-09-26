@@ -1,9 +1,7 @@
 ﻿const express = require("express");
-const {login, registerAdmin, registerManager, registerUser} = require("../controllers/authController");
+const authController = require("../controllers/authController");
 const {body} = require("express-validator");
-const {requireRole, requireToken} = require("../middleware/authMiddleware");
-
-// --- Internal
+const authMiddleware = require("../middleware/authMiddleware"); // Import the middleware
 
 const router = express.Router();
 
@@ -17,11 +15,9 @@ const passwordValidator = body("password")
     .matches(/\d/).withMessage("Password must include a number")
     .trim().escape();
 
-router.post("/register-user", emailValidator, passwordValidator, registerUser);
-router.post("/register-manager", requireToken, requireRole("admin"), emailValidator, passwordValidator, registerManager);
-router.post("/register-admin", emailValidator, passwordValidator, registerAdmin);
-router.post("/login", [emailValidator, body("password").notEmpty().trim().escape()], login);
-
-// --- Exported
+router.post("/register-user", emailValidator, passwordValidator, authController.registerUser);
+router.post("/register-manager", authMiddleware.requireToken, authMiddleware.requireRole("admin"), emailValidator, passwordValidator, authController.registerManager);
+router.post("/register-admin", emailValidator, passwordValidator, authController.registerAdmin);
+router.post("/login", [emailValidator, body("password").notEmpty().trim().escape()], authController.login);
 
 module.exports = router;
