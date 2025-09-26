@@ -27,6 +27,11 @@ export default defineConfig(({mode}) => {
                     changeOrigin: true,
                     secure: false,
                 },
+                "/csp-violation-report": {
+                    target: env.VITE_API_URI,
+                    changeOrigin: true,
+                    secure: false,
+                },
                 "/api": {
                     target: env.VITE_API_URI,
                     changeOrigin: true,
