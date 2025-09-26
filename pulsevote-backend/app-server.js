@@ -12,6 +12,13 @@ const options = {
     cert: fs.readFileSync('ssl/certificate.pem'),
 };
 
-https.createServer(options, app).listen(PORT, () => {
-    console.log(`Server operational on port ${PORT}`);
-});
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        https.createServer(options, app).listen(PORT, () => {
+            console.log(`Server operational on port ${PORT}`);
+        });
+    })
+    .catch((e) => {
+        console.error(e);
+    });
+
