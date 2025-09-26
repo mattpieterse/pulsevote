@@ -2,7 +2,7 @@
 
 // --- Internal
 
-const protect = (req, res, next) => {
+const requireToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res
@@ -26,4 +26,4 @@ const protect = (req, res, next) => {
 
 // --- Exported
 
-module.exports = {protect};
+module.exports = {requireToken};
